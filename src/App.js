@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import AddTodoForm from "./AddTodoForm";
+import "./App.css";
+import Todos from "./Todos";
 
-function App() {
+const storageName = "todos";
+
+const App = () => {
+  const [todos, setTodos] = useState([]);
+  const getTodos = () => {
+    const data = JSON.parse(localStorage.getItem(storageName));
+    setTodos(data || []);
+  };
+  const addTodo = (text) => {
+    setTodos((prev) => {
+      const todos = [{ text }, ...prev];
+      localStorage.setItem(storageName, JSON.stringify(todos));
+      return todos;
+    });
+  };
+  const deleteTodo = (text) => {
+    setTodos((prev) => {
+      const todos = prev.filter((todo) => todo.text !== text);
+      localStorage.setItem(storageName, JSON.stringify(todos));
+      return todos;
+    });
+  };
+
+  useEffect(() => {
+    getTodos();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App center">
+      <AddTodoForm addTodo={addTodo} />
+      <br />
+      <Todos todos={todos} deleteTodo={deleteTodo} />
     </div>
   );
-}
+};
 
 export default App;
